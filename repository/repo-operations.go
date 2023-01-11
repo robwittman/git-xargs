@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"golang.org/x/crypto/openpgp"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -331,6 +332,19 @@ func commitLocalChanges(status git.Status, config *config.GitXargsConfig, reposi
 		All: true,
 	}
 
+	if config.GpgKeyRing != "" && config.GpgKeyRingId != "" {
+		key, err := fetchSigningKey(config.GpgKeyRing, config.GpgKeyRingId, config.GpgKeyPassphrase)
+		if err != nil {
+			logger.WithFields(logrus.Fields{
+				"Error": err,
+				"Repo":  remoteRepository.GetName(),
+			})
+			return errors.WithStackTrace(err)
+		}
+
+		commitOps.SignKey = key
+	}
+
 	_, commitErr := worktree.Commit(config.CommitMessage, commitOps)
 
 	if commitErr != nil {
@@ -351,6 +365,49 @@ func commitLocalChanges(status git.Status, config *config.GitXargsConfig, reposi
 	}
 
 	return nil
+}
+
+func fetchSigningKey(keyringPath string, keyId string, passphrase string) (*openpgp.Entity, error) {
+	// TODO: This should be pulled from command flags
+	keyring, err := os.Open(keyringPath)
+	if err != nil {
+		return nil, err
+	}
+
+	entityList, err := openpgp.ReadKeyRing(keyring)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(entityList) == 0 {
+		return nil, fmt.Errorf("GPG Keyring is empty")
+	}
+
+	if strings.HasPrefix(keyId, "0x") {
+		keyId = strings.TrimPrefix(keyId, "0x")
+	}
+
+	if len(keyId) != 16 {
+		return nil, fmt.Errorf("invalid GPG key id length; expected %d, got %d", 16, len(keyId))
+	}
+
+	keyId = strings.ToUpper(keyId)
+
+	for _, ent := range entityList {
+		if ent.PrimaryKey.KeyIdString() != keyId {
+			continue
+		}
+
+		if passphrase != "" {
+			if err := ent.PrivateKey.Decrypt([]byte(passphrase)); err != nil {
+				return nil, err
+			}
+		}
+
+		return ent, nil
+	}
+
+	return nil, fmt.Errorf("failed to load GPG key from keyring")
 }
 
 // pushLocalBranch pushes the branch in the local clone of the /tmp/ directory repository to the GitHub remote origin

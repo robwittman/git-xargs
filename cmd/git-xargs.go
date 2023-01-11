@@ -42,6 +42,8 @@ func parseGitXargsConfig(c *cli.Context) (*config.GitXargsConfig, error) {
 	config.PullRequestRetries = c.Int("max-pr-retries")
 	config.SecondsToSleepWhenRateLimited = c.Int("seconds-to-wait-when-rate-limited")
 	config.NoSkipCI = c.Bool("no-skip-ci")
+	config.GpgKeyRingId = c.String("gpg-keyring-id")
+	config.GpgKeyRing = c.String("gpg-keyring")
 	// By default, prepend "[skip ci]" to commit messages, unless the user passed --no-skip-ci
 	if config.NoSkipCI == false {
 		commitMsgWithCISkip := fmt.Sprintf("%s %s", "[skip ci]", config.CommitMessage)

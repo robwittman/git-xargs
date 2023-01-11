@@ -24,6 +24,9 @@ const (
 	MaxPullRequestRetriesFlagName        = "max-pr-retries"
 	SecondsToWaitWhenRateLimitedFlagName = "seconds-to-wait-when-rate-limited"
 	NoSkipCIFlagName                     = "no-skip-ci"
+	GpgKeyRingFlagName                   = "gpg-keyring"
+	GpgKeyRingIdFlagName                 = "gpg-keyring-id"
+	GpgKeyPassphraseFlagName             = "gpg-passphrase"
 	DefaultMaxConcurrentRepos            = 0
 	DefaultSecondsBetweenPRs             = 1
 	DefaultMaxPullRequestRetries         = 3
@@ -108,5 +111,17 @@ var (
 	GenericNoSkipCIFlag = cli.BoolFlag{
 		Name:  NoSkipCIFlagName,
 		Usage: "By default, git-xargs prepends \"[skip ci]\" to its commit messages. Pass this flag to prevent \"[skip ci]\" from being prepending to commit messages.",
+	}
+	GenericGpgKeyRingFlag = cli.StringFlag{
+		Name:  GpgKeyRingFlagName,
+		Usage: "Specify a GPG KeyRing for signing",
+	}
+	GenericGpgKeyRingIdFlag = cli.StringFlag{
+		Name:  GpgKeyRingIdFlagName,
+		Usage: "Specify a GPG KeyRing ID for signing",
+	}
+	GenericGpgPassphraseFlag = cli.StringFlag{
+		Name:  GpgKeyPassphraseFlagName,
+		Usage: "Use a password to decrypt the GPG SignKey",
 	}
 )

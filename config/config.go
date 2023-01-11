@@ -39,6 +39,9 @@ type GitXargsConfig struct {
 	PullRequestRetries            int
 	SecondsToSleepWhenRateLimited int
 	NoSkipCI                      bool
+	GpgKeyRing                    string
+	GpgKeyRingId                  string
+	GpgKeyPassphrase              string
 	Ticker                        *time.Ticker
 }
 
@@ -70,6 +73,9 @@ func NewGitXargsConfig() *GitXargsConfig {
 		SecondsToSleepWhenRateLimited: common.DefaultSecondsToWaitWhenRateLimited,
 		PullRequestRetries:            common.DefaultMaxPullRequestRetries,
 		NoSkipCI:                      false,
+		GpgKeyRingId:                  "",
+		GpgKeyRing:                    "",
+		GpgKeyPassphrase:              "",
 	}
 }
 

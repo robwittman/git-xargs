@@ -77,6 +77,9 @@ func setupApp() *cli.App {
 		common.GenericMaxPullRequestRetriesFlag,
 		common.GenericSecondsToWaitWhenRateLimitedFlag,
 		common.GenericNoSkipCIFlag,
+		common.GenericGpgKeyRingFlag,
+		common.GenericGpgKeyRingIdFlag,
+		common.GenericGpgPassphraseFlag,
 	}
 
 	app.Action = cmd.RunGitXargs
